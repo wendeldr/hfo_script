@@ -14,6 +14,5 @@ env/
 .DS_Store
 
 # Project specific
-HFOs_edf_to_csv bak.py
-HFOs_edf_to_csv copy.py
+
 *.csv
