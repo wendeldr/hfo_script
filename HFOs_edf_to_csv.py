@@ -318,8 +318,8 @@ parser.add_argument("--hfo_band_low", type=int, default=80,
                     help="Lower frequency bound for HFO detection in Hz. Default: 80")
 parser.add_argument("--hfo_band_high", type=int, default=None,
                     help="Upper frequency bound for HFO detection in Hz. If None, defaults to Nyquist frequency / 2 - 1. Default: None")
-parser.add_argument("--window_size_sec", type=float, default=0.03,
-                    help="Sliding window size in seconds for RMS calculation. Default: 0.03")
+parser.add_argument("--window_size_sec", type=float, default=0.003,
+                    help="Sliding window size in seconds for RMS calculation. Default: 0.003")
 parser.add_argument("--overlap", type=float, default=0.25,
                     help="Fraction of window overlap for RMS calculation (0 to 1). Default: 0.25")
 parser.add_argument("--threshold", type=float, default=5.0,
