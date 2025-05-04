@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual Environments
+venv/
+.venv/
+env/
+.env/
+
+# OS-specific
+.DS_Store
+
+# Project specific
+HFOs_edf_to_csv bak.py
+HFOs_edf_to_csv copy.py
+*.csv
