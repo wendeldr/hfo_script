@@ -20,6 +20,7 @@ VERBOSITY_HIGH = 3      # Debug level information
 
 # Custom help message epilog
 custom_epilog = """
+From MNE-HFO:
 Root mean square (RMS) detection algorithm (Staba Detector)
 
 The original algorithm described in the reference, takes a sliding
@@ -331,7 +332,11 @@ parser.add_argument("--output_path", type=str, default=None,
 parser.add_argument("--save_type", type=str, choices=["raw", "counts", "both"], default="both",
                     help="Type of output to save ('raw' HFO events, 'counts' per channel, or 'both'). Default: both")
 parser.add_argument("--to_drop", nargs='+', default=[],
-                    help="List of channel names to drop before analysis (separated by spaces).")
+                    help="List of channel names to drop before counting HFOs (separated by spaces [e.g. --to_drop Fp1 Fp2 Q'1]).")
+parser.add_argument("--rereference_scheme", type=str, choices=["bipolar", "average", "none"], default="bipolar",
+                    help="Rereferencing scheme to apply ('bipolar', 'average', or 'none'). Default: bipolar")
+parser.add_argument("--disable_notch_filter", action='store_true',
+                    help="Disable the 60Hz notch filter and its harmonics.")
 
 
 args = parser.parse_args()
@@ -347,6 +352,8 @@ n_jobs = args.n_jobs
 output_path = args.output_path
 save_type = args.save_type
 to_drop = args.to_drop
+rereference_scheme = args.rereference_scheme # Get rereference scheme from args
+apply_notch = not args.disable_notch_filter # Get notch filter flag from args
 
 
 # Check if the input file exists
@@ -473,10 +480,11 @@ if isinstance(to_drop, list):
 mne_raw = read_edf(edf_path, drop_EEG_Prefix=True, preload=True, verbose=verbosity)
 sf = mne_raw.info['sfreq']
 
-if verbosity >= VERBOSITY_LOW:
-    print(f"Applying notch filter at 60Hz harmonics...")
-    
-mne_raw.notch_filter(np.arange(60, int(sf // 2), 60), 
+if apply_notch: # Check if notch filter should be applied
+    if verbosity >= VERBOSITY_LOW:
+        print(f"Applying notch filter at 60Hz harmonics...")
+        
+    mne_raw.notch_filter(np.arange(60, int(sf // 2), 60), 
                         picks='eeg', 
                         filter_length='auto', 
                         phase='zero',
@@ -512,7 +520,7 @@ if len(not_droppable) > 0:
     print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
     print("\n")
 
-mne_raw = rereference(mne_raw, rereference_scheme="bipolar", verbose=verbosity, todrop=droppable)
+mne_raw = rereference(mne_raw, rereference_scheme=rereference_scheme, verbose=verbosity, todrop=droppable) # Pass scheme to function
 
 window_size_samples = int(window_size_sec * sf)
 if verbosity >= VERBOSITY_LOW:
